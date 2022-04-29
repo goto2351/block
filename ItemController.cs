@@ -6,7 +6,8 @@ using UnityEngine;
 
 public class ItemController : MonoBehaviour
 {
-    [SerializeField] private Sprite sprite_item_boost;
+    [SerializeField] private Sprite sprite_item_boost; //加速アイテムの画像
+    [SerializeField] private Sprite sprite_item_rotate; // TODO 回転アイテムの画像を設定する
     [SerializeField] private GameObject itemBlock;
     // アイテムの画像書き換え用
     [SerializeField] private SpriteRenderer UI_ItemBox;
@@ -44,6 +45,13 @@ public class ItemController : MonoBehaviour
         // 仮:ballにアイテムをアタッチ
         //GameObject.Find("ball").AddComponent<Assets.Scripts.item.item_booster>()
         GameObject.Find("ball").AddComponent<Item_boost>();
+    }
+
+    // 回転アイテムの画像を表示、アタッチ
+    public void SetItemImage_Rotate()
+    {
+        UI_ItemBox.sprite = sprite_item_rotate;
+        GameObject.Find("ball").AddComponent<Item_rotate>();
     }
 
     public void ClearItemImage()
