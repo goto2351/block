@@ -30,7 +30,7 @@ public class BallController : MonoBehaviour
     {
         //ランダムに初期の移動方向を決める
         float rad = Random.Range(30.0f, 150.0f) * Mathf.Deg2Rad;
-        velocity = new Vector3(Mathf.Cos(rad), -1.0f * Mathf.Sin(rad), 0) * speed;
+        velocity = new Vector3(Mathf.Cos(rad), -1.0f * Mathf.Sin(rad), 0);
     }
 
 
@@ -59,7 +59,24 @@ public class BallController : MonoBehaviour
         } else if (collision.gameObject.tag == "itemBlock")
         {
             Destroy(collision.gameObject);
-            GameObject.Find("Canvas").GetComponent<ItemController>().SetItemImage_Boost();
+            GameObject.Find("Canvas").GetComponent<ItemController>().DestroyItemBlock();
+            // TODO ここの抽選とかは別の場所に移した方がいいかも
+            // アイテムの抽選
+            int item = Random.Range(0, 2);
+            // 選ばれたアイテムに応じて画像の表示、コンポーネントのアタッチを行う
+            switch (item)
+            {
+                case 0:
+                    // 加速アイテム
+                    GameObject.Find("Canvas").GetComponent<ItemController>().SetItemImage_Boost();
+                    break;
+
+                case 1:
+                    // 回転アイテム
+                    GameObject.Find("Canvas").GetComponent<ItemController>().SetItemImage_Rotate();
+                    break;
+            }
+            
         }
         else if (collision.gameObject.transform.parent.tag == "block") //ブロックに当たった時(当たり判定のオブジェクトが子なので親で判定)
         {
