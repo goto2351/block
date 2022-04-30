@@ -13,10 +13,15 @@ public class BallController : MonoBehaviour
     bool isStart;
     public bool isReflect = true; // ブロックと当たった時に反射するかどうか
 
+    private AudioClip[] se_hitBlock = new AudioClip[8]; // ブロックに当たった時の効果音
+
     // Start is called before the first frame update
     void Start()
     {
         velocity = new Vector3(0f, 0f, 0f);
+
+        // SEの読み込み
+        SetSe_hitBlock();
     }
 
     // Update is called once per frame
@@ -112,6 +117,11 @@ public class BallController : MonoBehaviour
             int point = Mathf.CeilToInt(100.0f * Mathf.Pow(1.5f, combo - 1.0f));
             GameObject.Find("Canvas").GetComponent<UIController>().AddScore(point); //スコア加算のサンプル
 
+            // SEを鳴らす
+            int seNum = combo - 1;
+            if (combo > 8) { seNum = 7; }
+            AudioSource.PlayClipAtPoint(se_hitBlock[seNum], new Vector3(0.0f, 0.0f, -10.0f));
+
             Destroy(collision.gameObject.transform.parent.gameObject);
 
             // 残りブロックが0個になったらゲームクリア
@@ -149,7 +159,15 @@ public class BallController : MonoBehaviour
                 }
             }
         }
-       
-        
+    }
+
+    // ブロックに当たった時の効果音をセットする
+    private void SetSe_hitBlock()
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            int num = i + 1;
+            se_hitBlock[i] = Resources.Load<AudioClip>("Audio/hitBlock_" + num.ToString());
+        }
     }
 }

@@ -9,6 +9,7 @@ public class Item_boost : MonoBehaviour
     private float defaultSpeed; // 効果適用前のスピード
     private int lifetime = 500; // 効果の持続時間
     private bool isActivated = false; // 使用状態
+    private　AudioClip se_boost;
 
     // 効果を適用する
     private void Activate()
@@ -18,6 +19,9 @@ public class Item_boost : MonoBehaviour
         // 加速する
         gameObject.GetComponent<BallController>().speed *= 1.5f;
         isActivated = true;
+
+        // SEを鳴らす
+        AudioSource.PlayClipAtPoint(se_boost, new Vector3(0.0f, 0.0f, -10.0f));
 
         // アイテム欄から画像を削除
         GameObject.Find("Canvas").GetComponent<ItemController>().ClearItemImage();
@@ -36,7 +40,8 @@ public class Item_boost : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        // SE読み込み
+        se_boost = Resources.Load<AudioClip>("Audio/sound_boost");
     }
 
     // Update is called once per frame
