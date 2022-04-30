@@ -10,6 +10,7 @@ public class BallController : MonoBehaviour
     private int combo;
     public float speed;
     bool isStart;
+    public bool isReflect = true; // ブロックと当たった時に反射するかどうか
 
     // Start is called before the first frame update
     void Start()
@@ -48,7 +49,7 @@ public class BallController : MonoBehaviour
         } else if (collision.gameObject.tag == "wall_top")
         {
             velocity.y *= -1.0f;
-        } 
+        }
         else if (collision.gameObject.tag == "wall_side")
         {
             // 横の壁に当たった時
@@ -62,7 +63,7 @@ public class BallController : MonoBehaviour
             GameObject.Find("Canvas").GetComponent<ItemController>().DestroyItemBlock();
             // TODO ここの抽選とかは別の場所に移した方がいいかも
             // アイテムの抽選
-            int item = Random.Range(0, 2);
+            int item = Random.Range(0, 3);
             // 選ばれたアイテムに応じて画像の表示、コンポーネントのアタッチを行う
             switch (item)
             {
@@ -75,8 +76,13 @@ public class BallController : MonoBehaviour
                     // 回転アイテム
                     GameObject.Find("Canvas").GetComponent<ItemController>().SetItemImage_Rotate();
                     break;
+
+                case 2:
+                    // 貫通アイテム
+                    GameObject.Find("Canvas").GetComponent<ItemController>().SetItemImage_Penetrate();
+                    break;
             }
-            
+
         }
         else if (collision.gameObject.transform.parent.tag == "block") //ブロックに当たった時(当たり判定のオブジェクトが子なので親で判定)
         {
@@ -88,15 +94,20 @@ public class BallController : MonoBehaviour
 
             Destroy(collision.gameObject.transform.parent.gameObject);
 
-            if (collision.gameObject.tag == "blockCol_top") //ブロックの上下に当たった時
+            // ボールの反射
+            if (isReflect == true)
             {
-                //todo; 角に当たった時スコアの加算が二回呼ばれる
-                // ブロックに当たったら跳ね返らせてブロックを消す
-                // todo: スコア、コンボの加算
-                velocity.y *= -1.0f;
-            } else //ブロックの左右に当たった時
-            {
-                velocity.x *= -1.0f;
+                if (collision.gameObject.tag == "blockCol_top") //ブロックの上下に当たった時
+                {
+                    //todo; 角に当たった時スコアの加算が二回呼ばれる
+                    // ブロックに当たったら跳ね返らせてブロックを消す
+                    // todo: スコア、コンボの加算
+                    velocity.y *= -1.0f;
+                }
+                else //ブロックの左右に当たった時
+                {
+                    velocity.x *= -1.0f;
+                }
             }
         }
        
