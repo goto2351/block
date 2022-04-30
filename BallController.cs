@@ -114,6 +114,25 @@ public class BallController : MonoBehaviour
 
             Destroy(collision.gameObject.transform.parent.gameObject);
 
+            // 残りブロックが0個になったらゲームクリア
+            if (GameObject.FindGameObjectsWithTag("block").Length == 1)
+            {
+                // 最大コンボの更新
+                if (maxCombo < combo)
+                {
+                    maxCombo = combo;
+                }
+
+                // メッセージの表示
+                GameObject.Find("Canvas").GetComponent<UIController>().PrintMessage_GameClear(maxCombo);
+
+                // アイテムボックスが追加されないようにする
+                GameObject.Find("Canvas").GetComponent<ItemController>().EndGame();
+
+                // ボールを消滅させる
+                Destroy(gameObject);
+            }
+
             // ボールの反射
             if (isReflect == true)
             {

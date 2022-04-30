@@ -12,6 +12,7 @@ public class UIController : MonoBehaviour
     [SerializeField] GameObject UICanvas; //ゲーム開始時にitemcontrollerをアタッチする
     int score;
     bool isStart;
+    bool isEnd = false; // ゲーム終了フラグ
 
     // Start is called before the first frame update
     void Start()
@@ -24,7 +25,7 @@ public class UIController : MonoBehaviour
     void Update()
     {
         scoreText.GetComponent<Text>().text = "Score: " + score.ToString("D6");
-        if (Input.GetMouseButtonUp(0) && isStart == false)
+        if (Input.GetMouseButtonUp(0) && isStart == false && isEnd == false)
         {
             Destroy(startText);
             GameObject.Find("ball").GetComponent<BallController>().StartGame();
@@ -55,5 +56,16 @@ public class UIController : MonoBehaviour
     {
         endText.GetComponent<Text>().text = "Game Over\n" +
             "score: " + score.ToString("D6") + "   max combo: " + maxCombo.ToString("D3");
+
+        isEnd = true;
+    }
+
+    // ゲームクリア時のテキストを表示する
+    public void PrintMessage_GameClear(int maxCombo)
+    {
+        endText.GetComponent<Text>().text = "Game Clear!\n" +
+            "score: " + score.ToString("D6") + "   max combo: " + maxCombo.ToString("D3");
+
+        isEnd = true;
     }
 }
