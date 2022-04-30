@@ -8,6 +8,7 @@ public class BallController : MonoBehaviour
 {
     public Vector3 velocity;
     private int combo;
+    private int maxCombo = 0; // 最大コンボ
     public float speed;
     bool isStart;
     public bool isReflect = true; // ブロックと当たった時に反射するかどうか
@@ -42,6 +43,12 @@ public class BallController : MonoBehaviour
         // パドルか上の壁に当たった時
         if (collision.gameObject.tag == "paddle")
         {
+            // 最大コンボの更新
+            if (maxCombo < combo)
+            {
+                maxCombo = combo;
+            }
+
             combo = 0;
             GameObject.Find("Canvas").GetComponent<UIController>().PrintCombo(combo);
 
@@ -56,7 +63,20 @@ public class BallController : MonoBehaviour
             velocity.x *= -1.0f;
         } else if (collision.gameObject.tag == "wall_bottom")
         {
-            // todo: 下の壁に当たった時にゲームオーバー
+            // 最大コンボの更新
+            if (maxCombo < combo)
+            {
+                maxCombo = combo;
+            }
+
+            GameObject.Find("Canvas").GetComponent<UIController>().PrintMessage_GameOver(maxCombo);
+
+            // アイテムボックスが追加されないようにする
+            GameObject.Find("Canvas").GetComponent<ItemController>().EndGame();
+
+            // ボールを消滅させる
+            Destroy(gameObject);
+
         } else if (collision.gameObject.tag == "itemBlock")
         {
             Destroy(collision.gameObject);

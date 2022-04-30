@@ -8,6 +8,7 @@ public class UIController : MonoBehaviour
     [SerializeField] GameObject scoreText;
     [SerializeField] GameObject comboText;
     [SerializeField] GameObject startText;
+    [SerializeField] GameObject endText;
     [SerializeField] GameObject UICanvas; //ゲーム開始時にitemcontrollerをアタッチする
     int score;
     bool isStart;
@@ -22,7 +23,7 @@ public class UIController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        scoreText.GetComponent<Text>().text = "Score: " + score.ToString("D5");
+        scoreText.GetComponent<Text>().text = "Score: " + score.ToString("D6");
         if (Input.GetMouseButtonUp(0) && isStart == false)
         {
             Destroy(startText);
@@ -47,5 +48,12 @@ public class UIController : MonoBehaviour
         {
             comboText.GetComponent<Text>().text = "";
         }
+    }
+
+    // ゲームオーバー時のテキストを表示する
+    public void PrintMessage_GameOver(int maxCombo)
+    {
+        endText.GetComponent<Text>().text = "Game Over\n" +
+            "score: " + score.ToString("D6") + "   max combo: " + maxCombo.ToString("D3");
     }
 }

@@ -33,6 +33,11 @@ public class ItemController : MonoBehaviour
         isStart = true;
     }
 
+    public void EndGame()
+    {
+        isStart = false;
+    }
+
     public void DestroyItemBlock()
     {
         isExist_itemBlock = false;
