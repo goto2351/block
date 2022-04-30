@@ -11,8 +11,8 @@ public class Item_rotate : MonoBehaviour
     private void Activate()
     {
         // ランダムな向きの方向ベクトルを生成する
-        float rad = Random.Range(30.0f, 150.0f) * Mathf.Deg2Rad;
-        Vector3 new_velocity = new Vector3(Mathf.Cos(rad), -1.0f * Mathf.Sin(rad), 0);
+        float rad = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+        Vector3 new_velocity = new Vector3(Mathf.Cos(rad),  Mathf.Sin(rad), 0);
 
         // 方向ベクトルをballに適用する
         gameObject.GetComponent<BallController>().velocity = new_velocity;
