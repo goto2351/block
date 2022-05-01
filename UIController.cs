@@ -30,6 +30,7 @@ public class UIController : MonoBehaviour
             Destroy(startText);
             GameObject.Find("ball").GetComponent<BallController>().StartGame();
             GameObject.Find("Canvas").GetComponent<ItemController>().StartGame();
+            isStart = true;
         }
     }
 
