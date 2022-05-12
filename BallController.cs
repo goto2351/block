@@ -107,6 +107,9 @@ public class BallController : MonoBehaviour
             // TODO ここの抽選とかは別の場所に移した方がいいかも
             // アイテムの抽選
             int item = Random.Range(0, 3);
+            // アイテムブロックの無効化(->アイテム使用時に有効化する)
+            GameObject.Find("Canvas").GetComponent<ItemController>().DeactivateItemBlock();
+
             // 選ばれたアイテムに応じて画像の表示、コンポーネントのアタッチを行う
             switch (item)
             {
@@ -188,6 +191,7 @@ public class BallController : MonoBehaviour
             }
         }
     }
+
 
     // ブロックに当たった時の効果音をセットする
     private void SetSe_hitBlock()
