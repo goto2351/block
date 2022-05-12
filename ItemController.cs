@@ -40,7 +40,7 @@ public class ItemController : MonoBehaviour
 
     public void DestroyItemBlock()
     {
-        isActivate_itemBlock = false;
+        isActivate_itemBlock = true;
     }
 
     //(仮)アイテム欄にアイテムの画像を表示する
