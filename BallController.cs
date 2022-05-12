@@ -12,6 +12,8 @@ public class BallController : MonoBehaviour
     public float speed;
     bool isStart;
     public bool isReflect = true; // ブロックと当たった時に反射するかどうか
+    HashSet<string> hit_list = new HashSet<string>(); // 既に当たったブロックのリスト
+
     //ボールの見た目
     [SerializeField] Sprite ball_normal;
     [SerializeField] Sprite ball_penetrate;
@@ -127,51 +129,55 @@ public class BallController : MonoBehaviour
         }
         else if (collision.gameObject.transform.parent.tag == "block") //ブロックに当たった時(当たり判定のオブジェクトが子なので親で判定)
         {
-            combo += 1;
-            GameObject.Find("Canvas").GetComponent<UIController>().PrintCombo(combo);
-
-            int point = Mathf.CeilToInt(100.0f * Mathf.Pow(1.5f, combo - 1.0f));
-            GameObject.Find("Canvas").GetComponent<UIController>().AddScore(point); //スコア加算のサンプル
-
-            // SEを鳴らす
-            int seNum = combo - 1;
-            if (combo > 8) { seNum = 7; }
-            AudioSource.PlayClipAtPoint(se_hitBlock[seNum], new Vector3(0.0f, 0.0f, -10.0f));
-
-            Destroy(collision.gameObject.transform.parent.gameObject);
-
-            // 残りブロックが0個になったらゲームクリア
-            if (GameObject.FindGameObjectsWithTag("block").Length == 1)
+            // 既に当たったブロックのリストに入っていなければ衝突処理を実行する
+            if (hit_list.Add(collision.gameObject.transform.parent.name))
             {
-                // 最大コンボの更新
-                if (maxCombo < combo)
+                combo += 1;
+                GameObject.Find("Canvas").GetComponent<UIController>().PrintCombo(combo);
+
+                int point = Mathf.CeilToInt(100.0f * Mathf.Pow(1.5f, combo - 1.0f));
+                GameObject.Find("Canvas").GetComponent<UIController>().AddScore(point); //スコア加算のサンプル
+
+                // SEを鳴らす
+                int seNum = combo - 1;
+                if (combo > 8) { seNum = 7; }
+                AudioSource.PlayClipAtPoint(se_hitBlock[seNum], new Vector3(0.0f, 0.0f, -10.0f));
+
+                Destroy(collision.gameObject.transform.parent.gameObject);
+
+                // 残りブロックが0個になったらゲームクリア
+                if (GameObject.FindGameObjectsWithTag("block").Length == 1)
                 {
-                    maxCombo = combo;
+                    // 最大コンボの更新
+                    if (maxCombo < combo)
+                    {
+                        maxCombo = combo;
+                    }
+
+                    // メッセージの表示
+                    GameObject.Find("Canvas").GetComponent<UIController>().PrintMessage_GameClear(maxCombo);
+
+                    // アイテムボックスが追加されないようにする
+                    GameObject.Find("Canvas").GetComponent<ItemController>().EndGame();
+
+                    // ボールを消滅させる
+                    Destroy(gameObject);
                 }
 
-                // メッセージの表示
-                GameObject.Find("Canvas").GetComponent<UIController>().PrintMessage_GameClear(maxCombo);
-
-                // アイテムボックスが追加されないようにする
-                GameObject.Find("Canvas").GetComponent<ItemController>().EndGame();
-
-                // ボールを消滅させる
-                Destroy(gameObject);
-            }
-
-            // ボールの反射
-            if (isReflect == true)
-            {
-                if (collision.gameObject.tag == "blockCol_top") //ブロックの上下に当たった時
+                // ボールの反射
+                if (isReflect == true)
                 {
-                    //todo; 角に当たった時スコアの加算が二回呼ばれる
-                    // ブロックに当たったら跳ね返らせてブロックを消す
-                    // todo: スコア、コンボの加算
-                    velocity.y *= -1.0f;
-                }
-                else //ブロックの左右に当たった時
-                {
-                    velocity.x *= -1.0f;
+                    if (collision.gameObject.tag == "blockCol_top") //ブロックの上下に当たった時
+                    {
+                        //todo; 角に当たった時スコアの加算が二回呼ばれる
+                        // ブロックに当たったら跳ね返らせてブロックを消す
+                        // todo: スコア、コンボの加算
+                        velocity.y *= -1.0f;
+                    }
+                    else //ブロックの左右に当たった時
+                    {
+                        velocity.x *= -1.0f;
+                    }
                 }
             }
         }
