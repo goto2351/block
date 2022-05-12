@@ -64,7 +64,7 @@ public class UIController : MonoBehaviour
     // ゲームクリア時のテキストを表示する
     public void PrintMessage_GameClear(int maxCombo)
     {
-        endText.GetComponent<Text>().text = "Game Clear!\n" +
+        endText.GetComponent<Text>().text = "Stage Clear!\n" +
             "score: " + score.ToString("D6") + "   max combo: " + maxCombo.ToString("D3");
 
         isEnd = true;

@@ -12,8 +12,12 @@ public class BallController : MonoBehaviour
     public float speed;
     bool isStart;
     public bool isReflect = true; // ブロックと当たった時に反射するかどうか
+    //ボールの見た目
+    [SerializeField] Sprite ball_normal;
+    [SerializeField] Sprite ball_penetrate;
 
     private AudioClip[] se_hitBlock = new AudioClip[8]; // ブロックに当たった時の効果音
+    private AudioClip se_itemBlock; // アイテムブロックに当たった時の効果音
 
     // Start is called before the first frame update
     void Start()
@@ -22,6 +26,7 @@ public class BallController : MonoBehaviour
 
         // SEの読み込み
         SetSe_hitBlock();
+        se_itemBlock = Resources.Load<AudioClip>("Audio/itemBlock");
     }
 
     // Update is called once per frame
@@ -40,7 +45,17 @@ public class BallController : MonoBehaviour
         velocity = new Vector3(Mathf.Cos(rad), -1.0f * Mathf.Sin(rad), 0);
     }
 
+    // 見た目を光るボールにかえる(アイテム用)
+    public void ChangeSpriteToPenetrateBall()
+    {
+        gameObject.GetComponent<SpriteRenderer>().sprite = ball_penetrate;
+    }
 
+    // ボールの見た目を通常にする(ボール用)
+    public void ChangeSpriteToNormalBall()
+    {
+        gameObject.GetComponent<SpriteRenderer>().sprite = ball_normal;
+    }
 
     // オブジェクトと衝突したときの処理
     private void OnTriggerEnter2D(Collider2D collision)
@@ -86,6 +101,7 @@ public class BallController : MonoBehaviour
         {
             Destroy(collision.gameObject);
             GameObject.Find("Canvas").GetComponent<ItemController>().DestroyItemBlock();
+            AudioSource.PlayClipAtPoint(se_itemBlock, new Vector3(0.0f, 0.0f, -10.0f)); // SEを鳴らす
             // TODO ここの抽選とかは別の場所に移した方がいいかも
             // アイテムの抽選
             int item = Random.Range(0, 3);

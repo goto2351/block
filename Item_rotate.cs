@@ -6,6 +6,7 @@ using UnityEngine;
 public class Item_rotate : MonoBehaviour
 {
     private bool isActivated = false; //アイテムの使用状態
+    private AudioClip se_rotate;
 
     // アイテムの効果を発動する
     private void Activate()
@@ -17,13 +18,17 @@ public class Item_rotate : MonoBehaviour
         // 方向ベクトルをballに適用する
         gameObject.GetComponent<BallController>().velocity = new_velocity;
 
+        // SEを鳴らす
+        AudioSource.PlayClipAtPoint(se_rotate, new Vector3(0.0f, 0.0f, -5.0f));
+
         // アイテム欄から画像を削除
         GameObject.Find("Canvas").GetComponent<ItemController>().ClearItemImage();
     }
     // Start is called before the first frame update
     void Start()
     {
-        
+        //se読み込み
+        se_rotate = Resources.Load<AudioClip>("Audio/item_rotate");
     }
 
     // Update is called once per frame

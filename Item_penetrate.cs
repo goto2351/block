@@ -9,6 +9,7 @@ public class Item_penetrate : MonoBehaviour
 {
     private bool isActivated = false; // アイテムの使用状態
     private int lifetime = 1000; // アイテムの効果持続時間
+    private AudioClip se_penetrate;
 
     // 効果を適用する
     private void Activate()
@@ -20,12 +21,21 @@ public class Item_penetrate : MonoBehaviour
 
         // アイテム欄から画像を削除
         GameObject.Find("Canvas").GetComponent<ItemController>().ClearItemImage();
+
+        // SEを鳴らす
+        AudioSource.PlayClipAtPoint(se_penetrate, new Vector3(0.0f, 0.0f, -10.0f));
+
+        // ボールの見た目を変える
+        gameObject.GetComponent<BallController>().ChangeSpriteToPenetrateBall();
     }
 
     // 効果を終了して元に戻す
     private void Deactivate() {
         // ブロックに当たった時の反射を再開する
         gameObject.GetComponent<BallController>().isReflect = true;
+
+        // ボールの見た目を元に戻す
+        gameObject.GetComponent<BallController>().ChangeSpriteToNormalBall();
 
         // コンポーネントを削除する
         Destroy(gameObject.GetComponent<Item_penetrate>());
@@ -34,7 +44,8 @@ public class Item_penetrate : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        // SE読み込み
+        se_penetrate = Resources.Load<AudioClip>("Audio/sound_boost");
     }
 
     // Update is called once per frame
