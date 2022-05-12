@@ -157,6 +157,12 @@ public class BallController : MonoBehaviour
                     // メッセージの表示
                     GameObject.Find("Canvas").GetComponent<UIController>().PrintMessage_GameClear(maxCombo);
 
+                    // アイテムボックスがあれば消す
+                    if (GameObject.FindGameObjectWithTag("itemBlock") != null)
+                    {
+                        Destroy(GameObject.FindGameObjectWithTag("itemBlock"));
+                    }
+
                     // アイテムボックスが追加されないようにする
                     GameObject.Find("Canvas").GetComponent<ItemController>().EndGame();
 
