@@ -25,6 +25,9 @@ public class Item_boost : MonoBehaviour
 
         // アイテム欄から画像を削除
         GameObject.Find("Canvas").GetComponent<ItemController>().ClearItemImage();
+
+        // アイテムブロックを有効化
+        GameObject.Find("Canvas").GetComponent<ItemController>().ActivateItemBlock();
     }
 
     // 効果を終了する

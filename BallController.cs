@@ -12,6 +12,8 @@ public class BallController : MonoBehaviour
     public float speed;
     bool isStart;
     public bool isReflect = true; // ブロックと当たった時に反射するかどうか
+    HashSet<string> hit_list = new HashSet<string>(); // 既に当たったブロックのリスト
+
     //ボールの見た目
     [SerializeField] Sprite ball_normal;
     [SerializeField] Sprite ball_penetrate;
@@ -72,7 +74,30 @@ public class BallController : MonoBehaviour
             combo = 0;
             GameObject.Find("Canvas").GetComponent<UIController>().PrintCombo(combo);
 
+            // パドルに当たった時の反射
+            // 当たった位置によって向きを少し変える
             velocity.y *= -1.0f;
+
+            // ボールの現在位置とパドルの中心位置の差を求める
+            float dist =  collision.gameObject.transform.position.x - gameObject.transform.position.x; // パドルの左側の時プラス, 右側の時マイナス
+            float frac = dist / 1.15f; // パドルの幅の半分で割る（割合を求める）
+            // 回転用の三角関数の値を求める
+            if (frac != 0)
+            {
+                float rad = (15f / frac) * Mathf.Deg2Rad;
+                float cos = Mathf.Cos(rad);
+                float sin = Mathf.Sin(rad);
+
+                // 反射後の向きを傾ける
+                float old_y = velocity.y;
+                velocity.x = velocity.x * cos - velocity.y * sin;
+                velocity.y = velocity.x * sin + velocity.y * cos;
+                if (velocity.y <= 0) velocity.y = old_y;
+                
+                velocity.Normalize();
+            }
+            
+
         } else if (collision.gameObject.tag == "wall_top")
         {
             velocity.y *= -1.0f;
@@ -105,6 +130,9 @@ public class BallController : MonoBehaviour
             // TODO ここの抽選とかは別の場所に移した方がいいかも
             // アイテムの抽選
             int item = Random.Range(0, 3);
+            // アイテムブロックの無効化(->アイテム使用時に有効化する)
+            GameObject.Find("Canvas").GetComponent<ItemController>().DeactivateItemBlock();
+
             // 選ばれたアイテムに応じて画像の表示、コンポーネントのアタッチを行う
             switch (item)
             {
@@ -127,55 +155,66 @@ public class BallController : MonoBehaviour
         }
         else if (collision.gameObject.transform.parent.tag == "block") //ブロックに当たった時(当たり判定のオブジェクトが子なので親で判定)
         {
-            combo += 1;
-            GameObject.Find("Canvas").GetComponent<UIController>().PrintCombo(combo);
-
-            int point = Mathf.CeilToInt(100.0f * Mathf.Pow(1.5f, combo - 1.0f));
-            GameObject.Find("Canvas").GetComponent<UIController>().AddScore(point); //スコア加算のサンプル
-
-            // SEを鳴らす
-            int seNum = combo - 1;
-            if (combo > 8) { seNum = 7; }
-            AudioSource.PlayClipAtPoint(se_hitBlock[seNum], new Vector3(0.0f, 0.0f, -10.0f));
-
-            Destroy(collision.gameObject.transform.parent.gameObject);
-
-            // 残りブロックが0個になったらゲームクリア
-            if (GameObject.FindGameObjectsWithTag("block").Length == 1)
+            // 既に当たったブロックのリストに入っていなければ衝突処理を実行する
+            if (hit_list.Add(collision.gameObject.transform.parent.name))
             {
-                // 最大コンボの更新
-                if (maxCombo < combo)
+                combo += 1;
+                GameObject.Find("Canvas").GetComponent<UIController>().PrintCombo(combo);
+
+                int point = Mathf.CeilToInt(100.0f * Mathf.Pow(1.5f, combo - 1.0f));
+                GameObject.Find("Canvas").GetComponent<UIController>().AddScore(point); //スコア加算のサンプル
+
+                // SEを鳴らす
+                int seNum = combo - 1;
+                if (combo > 8) { seNum = 7; }
+                AudioSource.PlayClipAtPoint(se_hitBlock[seNum], new Vector3(0.0f, 0.0f, -10.0f));
+
+                Destroy(collision.gameObject.transform.parent.gameObject);
+
+                // 残りブロックが0個になったらゲームクリア
+                if (GameObject.FindGameObjectsWithTag("block").Length == 1)
                 {
-                    maxCombo = combo;
+                    // 最大コンボの更新
+                    if (maxCombo < combo)
+                    {
+                        maxCombo = combo;
+                    }
+
+                    // メッセージの表示
+                    GameObject.Find("Canvas").GetComponent<UIController>().PrintMessage_GameClear(maxCombo);
+
+                    // アイテムボックスがあれば消す
+                    if (GameObject.FindGameObjectWithTag("itemBlock") != null)
+                    {
+                        Destroy(GameObject.FindGameObjectWithTag("itemBlock"));
+                    }
+
+                    // アイテムボックスが追加されないようにする
+                    GameObject.Find("Canvas").GetComponent<ItemController>().EndGame();
+
+                    // ボールを消滅させる
+                    Destroy(gameObject);
                 }
 
-                // メッセージの表示
-                GameObject.Find("Canvas").GetComponent<UIController>().PrintMessage_GameClear(maxCombo);
-
-                // アイテムボックスが追加されないようにする
-                GameObject.Find("Canvas").GetComponent<ItemController>().EndGame();
-
-                // ボールを消滅させる
-                Destroy(gameObject);
-            }
-
-            // ボールの反射
-            if (isReflect == true)
-            {
-                if (collision.gameObject.tag == "blockCol_top") //ブロックの上下に当たった時
+                // ボールの反射
+                if (isReflect == true)
                 {
-                    //todo; 角に当たった時スコアの加算が二回呼ばれる
-                    // ブロックに当たったら跳ね返らせてブロックを消す
-                    // todo: スコア、コンボの加算
-                    velocity.y *= -1.0f;
-                }
-                else //ブロックの左右に当たった時
-                {
-                    velocity.x *= -1.0f;
+                    if (collision.gameObject.tag == "blockCol_top") //ブロックの上下に当たった時
+                    {
+                        //todo; 角に当たった時スコアの加算が二回呼ばれる
+                        // ブロックに当たったら跳ね返らせてブロックを消す
+                        // todo: スコア、コンボの加算
+                        velocity.y *= -1.0f;
+                    }
+                    else //ブロックの左右に当たった時
+                    {
+                        velocity.x *= -1.0f;
+                    }
                 }
             }
         }
     }
+
 
     // ブロックに当たった時の効果音をセットする
     private void SetSe_hitBlock()

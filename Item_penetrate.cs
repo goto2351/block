@@ -22,6 +22,9 @@ public class Item_penetrate : MonoBehaviour
         // アイテム欄から画像を削除
         GameObject.Find("Canvas").GetComponent<ItemController>().ClearItemImage();
 
+        // アイテムブロックを有効化
+        GameObject.Find("Canvas").GetComponent<ItemController>().ActivateItemBlock();
+
         // SEを鳴らす
         AudioSource.PlayClipAtPoint(se_penetrate, new Vector3(0.0f, 0.0f, -10.0f));
 

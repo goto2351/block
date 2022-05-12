@@ -23,6 +23,9 @@ public class Item_rotate : MonoBehaviour
 
         // アイテム欄から画像を削除
         GameObject.Find("Canvas").GetComponent<ItemController>().ClearItemImage();
+
+        // アイテムブロックを有効化
+        GameObject.Find("Canvas").GetComponent<ItemController>().ActivateItemBlock();
     }
     // Start is called before the first frame update
     void Start()

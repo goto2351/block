@@ -16,20 +16,20 @@ public class ItemController : MonoBehaviour
 
     // itemblock用のタイマーとフラグ
     //private int itemBlockTimer;
-    private bool isExist_itemBlock;
+    private bool isActivate_itemBlock;
 
     // Start is called before the first frame update
     void Start()
     {
         isStart = false;
         //itemBlockTimer = 0;
-        isExist_itemBlock = false;
+        isActivate_itemBlock = true;
     }
 
     public void StartGame()
     {
         //GameObject.Find("itemBox").GetComponent<SpriteRenderer>().sprite = sprite_item_boost;
-        //isExist_itemBlock = true;
+        //isActivate_itemBlock = true;
         isStart = true;
     }
 
@@ -40,7 +40,7 @@ public class ItemController : MonoBehaviour
 
     public void DestroyItemBlock()
     {
-        isExist_itemBlock = false;
+        isActivate_itemBlock = true;
     }
 
     //(仮)アイテム欄にアイテムの画像を表示する
@@ -72,15 +72,25 @@ public class ItemController : MonoBehaviour
         UI_ItemBox.sprite = null;
     }
 
+
+    public void ActivateItemBlock()
+    {
+        isActivate_itemBlock = true;
+    }
+
+    public void DeactivateItemBlock()
+    {
+        isActivate_itemBlock = false;
+    }
     // Update is called once per frame
     void Update()
     {
         // 一定時間ごとにランダムにアイテムブロックを出現させる
-        if (Random.Range(0, 1000) == 1 && isStart == true && isExist_itemBlock == false)
+        if (Random.Range(0, 1000) == 1 && isStart == true && isActivate_itemBlock == true)
         {
             Vector3 pos = new Vector3(Random.Range(-6f, 6f), -1f, 0);
             Instantiate(itemBlock, pos, Quaternion.identity);
-            isExist_itemBlock = true;
+            isActivate_itemBlock = false;
         }
     }
 
