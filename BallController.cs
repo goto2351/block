@@ -75,30 +75,29 @@ public class BallController : MonoBehaviour
             GameObject.Find("Canvas").GetComponent<UIController>().PrintCombo(combo);
 
             // パドルに当たった時の反射
-            // 当たった位置によって向きを少し変える
             velocity.y *= -1.0f;
 
+            // 当たった位置によって向きを少し変える
             // ボールの現在位置とパドルの中心位置の差を求める
             float dist =  collision.gameObject.transform.position.x - gameObject.transform.position.x; // パドルの左側の時プラス, 右側の時マイナス
             float frac = dist / 1.15f; // パドルの幅の半分で割る（割合を求める）
             // 回転用の三角関数の値を求める
-            if (frac != 0)
-            {
-                float rad = (15f / frac) * Mathf.Deg2Rad;
-                float cos = Mathf.Cos(rad);
-                float sin = Mathf.Sin(rad);
+            float rad = 15f * frac * Mathf.Deg2Rad;
+            float cos = Mathf.Cos(rad);
+            float sin = Mathf.Sin(rad);
 
-                // 反射後の向きを傾ける
-                float old_y = velocity.y;
-                velocity.x = velocity.x * cos - velocity.y * sin;
-                velocity.y = velocity.x * sin + velocity.y * cos;
-                if (velocity.y <= 0) velocity.y = old_y;
-                
-                velocity.Normalize();
-            }
-            
+            // 反射後の向きを傾ける
+            float old_y = velocity.y;
+            velocity.x = velocity.x * cos - velocity.y * sin;
+            velocity.y = velocity.x * sin + velocity.y * cos;
+            if (velocity.y <= 0) velocity.y = old_y;
 
-        } else if (collision.gameObject.tag == "wall_top")
+            velocity.Normalize();
+
+
+
+        }
+        else if (collision.gameObject.tag == "wall_top")
         {
             velocity.y *= -1.0f;
         }
